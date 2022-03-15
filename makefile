@@ -23,13 +23,13 @@ objdir=objdir
 debugObjDir=$(objdir)/debug
 releaseObjDir=$(objdir)/release
 
-objs=main.o
+objs=main.o server_logic.o simulator.o
 
 debugObjs=$(addprefix $(debugObjDir)/,$(objs))
 releaseObjs=$(addprefix $(releaseObjDir)/,$(objs))
 
 # Headers
-headers=
+headers=server_logic.hpp simulator.hpp grid.hpp
 
 # Debug Build
 $(OUT_DEBUG): $(debugObjs)
