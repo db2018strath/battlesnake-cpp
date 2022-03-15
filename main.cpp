@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     CROW_ROUTE(app, "/move").methods(crow::HTTPMethod::POST)([](const crow::request& req){
         crow::json::rvalue json = crow::json::load(req.body.c_str(), req.body.length());
 
-        const std::string move = ServerLogic::choose_move();
+        const std::string move = ServerLogic::choose_move(json);
         
         return R"({"move": ")" + move + "\"}";
     });
