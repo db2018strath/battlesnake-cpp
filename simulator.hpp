@@ -2,7 +2,9 @@
 #define SIMULATOR_INCLUDED
 
 #include <optional>
+#include <string>
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
 
 #include "crow/json.h"
@@ -47,6 +49,8 @@ namespace Simulator {
         // Removes the end of the tail
         void pop_tail();
 
+        void set_health(int t_health);
+
         [[nodiscard]] Position get_head() const;
         [[nodiscard]] const std::vector<Position>& get_body() const;
 
@@ -62,15 +66,16 @@ namespace Simulator {
     struct Ruleset {
         unsigned int w, h, noSnakes, minFood, foodSpawnChance;
         int startingHealth;
+        bool spawnFood;
     };
 
-    constexpr Ruleset DEFAULT_RULESET {11, 11, 2, 1, 15, 100};
+    constexpr Ruleset DEFAULT_RULESET {11, 11, 2, 1, 15, 100, true};
 
     class Board {
     public:
         //Board(Ruleset t_ruleset=DEFAULT_RULESET);
         //Board(const std::vector<Snake>& t_snakes, Ruleset t_ruleset=DEFAULT_RULESET);
-        Board(const std::vector<Snake>& t_snakes, Grid<bool> t_food, Ruleset t_ruleset=DEFAULT_RULESET);
+        Board(const std::unordered_map<std::string, Snake>& t_snakes, Grid<bool> t_food, Ruleset t_ruleset=DEFAULT_RULESET);
 
         void update(const std::vector<Direction>& t_moves);
 
@@ -78,14 +83,21 @@ namespace Simulator {
 
         // Returns the index of the snake that has won the game
         // If all snakes have been eliminated then m_snakes.size() is returned
-        [[nodiscard]] std::optional<unsigned int> get_winner() const;
+        [[nodiscard]] std::optional<std::string> get_winner() const;
 
         [[nodiscard]] std::string to_string() const;
 
     private:
-        std::vector<Snake> m_snakes;
-        std::unordered_set<unsigned int> m_eliminatedSnakes;
+        void feed_snakes();
+        void randomly_place_food(unsigned int t_count);
+        void spawn_food();
+        void eliminate_snakes();
+
+        [[nodiscard]] bool is_in_bounds(Position t_position) const;
+
+        std::unordered_map<std::string, Snake> m_snakes;
         Grid<bool> m_food;
+
         const Ruleset m_ruleset;
     };
 
