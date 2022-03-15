@@ -1,8 +1,8 @@
 # Constants
 CXX=g++
 
-LINKFLAGS=
-INCLUDEFLAGS=
+LINKFLAGS=-lboost_system -lpthread
+INCLUDEFLAGS=-Ivendor/crow/include
 
 OTHER_FLAGS=
 
