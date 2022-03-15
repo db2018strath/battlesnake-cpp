@@ -58,10 +58,10 @@ namespace Simulator {
     }
 
 
-    Board::Board(const std::vector<Snake>& t_snakes, Grid<bool> t_apples, Ruleset t_ruleset)
+    Board::Board(const std::vector<Snake>& t_snakes, Grid<bool> t_food, Ruleset t_ruleset)
         : m_snakes(t_snakes)
         , m_eliminatedSnakes({})
-        , m_apples(t_apples)
+        , m_food(t_food)
         , m_ruleset(t_ruleset)
     {
         ;
@@ -96,20 +96,33 @@ namespace Simulator {
         std::string result;
 
         for (unsigned int x = 0; x < m_ruleset.w; x++) {
-            result += "###";
+            result += "##";
         }
+        result += "###\n";
 
         for (unsigned int y = 0; y < m_ruleset.h; y++) {
             result += "# ";
 
             for (unsigned int x = 0; x < m_ruleset.w; x++) {
                 const Position pos{x, y};
+
+                bool snakeFound = false;
                 for (unsigned int i = 0; i < m_snakes.size(); i++) {
                     const auto& body = m_snakes[i].get_body();
                     if (std::find(body.begin(), body.end(), pos) != body.end()) {
-                        result += std::to_string(i) + ' ';
+                        if (pos == m_snakes[i].get_head()) {
+                            result += "H ";
+                        }
+                        else {
+                            result += std::to_string(i) + ' ';
+                        }
+                        snakeFound = true;                        
+                        break;
                     }
-                    else if (m_apples(x, y)) {
+                }
+
+                if (!snakeFound) {
+                    if (m_food(x, y)) {
                         result += "* ";
                     }
                     else {
@@ -118,12 +131,13 @@ namespace Simulator {
                 }
             }
 
-            result += '#';
+            result += "#\n";
         }
 
         for (unsigned int x = 0; x < m_ruleset.w; x++) {
-            result += "###";
+            result += "##";
         }
+        result += "###\n";
 
         return result;
     }

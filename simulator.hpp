@@ -70,7 +70,7 @@ namespace Simulator {
     public:
         //Board(Ruleset t_ruleset=DEFAULT_RULESET);
         //Board(const std::vector<Snake>& t_snakes, Ruleset t_ruleset=DEFAULT_RULESET);
-        Board(const std::vector<Snake>& t_snakes, Grid<bool> t_apples, Ruleset t_ruleset=DEFAULT_RULESET);
+        Board(const std::vector<Snake>& t_snakes, Grid<bool> t_food, Ruleset t_ruleset=DEFAULT_RULESET);
 
         void update(const std::vector<Direction>& t_moves);
 
@@ -85,7 +85,7 @@ namespace Simulator {
     private:
         std::vector<Snake> m_snakes;
         std::unordered_set<unsigned int> m_eliminatedSnakes;
-        Grid<bool> m_apples;
+        Grid<bool> m_food;
         const Ruleset m_ruleset;
     };
 
