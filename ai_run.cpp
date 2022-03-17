@@ -12,15 +12,18 @@ int main(int argc, char* argv[]) {
     const Simulator::FoodGrid food = {Grid<bool>(11, 11), 0};
     Simulator::Board board{snakes, food};
 
-    std::cout << board.to_string() << '\n';
+    std::cout << board.to_string();
     while (board.get_winner() == std::nullopt) {
         std::unordered_map<std::string, Simulator::Direction> moveMap;
         for (const auto& [id, s] : snakes) {
-            moveMap[id] = AI::random_player(board, id);
+            const Simulator::Direction move = AI::avoid_walls_player(board, id);
+            std::cout << id << " chose '" << Simulator::direction_to_string(move) << "'\n";
+            moveMap[id] = move;
         }
+        std::cout << '\n';
 
         board.update(moveMap);
-        std::cout << board.to_string() << '\n';
+        std::cout << board.to_string();
     }
 
     return 0;

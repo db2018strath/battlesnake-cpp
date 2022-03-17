@@ -32,21 +32,7 @@ namespace Simulator {
     }
 
     void Snake::move(Direction t_direction) {
-        const Position head = get_head();
-        switch(t_direction) {
-            case Direction::UP:
-                m_body.push_back(Position{head.x, head.y - 1});
-                break;
-            case Direction::DOWN:
-                m_body.push_back(Position{head.x, head.y + 1});
-                break;
-            case Direction::LEFT:
-                m_body.push_back(Position{head.x - 1, head.y});
-                break;
-            case Direction::RIGHT:
-                m_body.push_back(Position{head.x + 1, head.y});
-                break;
-        }
+        m_body.push_back(update_position(get_head(), t_direction));
         m_health--;
     }
 
@@ -98,6 +84,48 @@ namespace Simulator {
 
     Ruleset Board::get_ruleset() const {
         return m_ruleset;
+    }
+
+    bool Board::is_in_bounds(Position t_position) const {
+        return 
+            (t_position.x >= 0 && t_position.x < m_ruleset.w) &&
+            (t_position.y >= 0 && t_position.y < m_ruleset.h);
+    }
+
+    bool Board::is_safe_cell(const std::string& t_id, Position t_position) const {
+        if (!is_in_bounds(t_position)) {
+            return false;
+        }
+
+        const Snake& snake = m_snakes.at(t_id);
+
+        const auto& body = snake.get_body();
+        if (std::find(body.begin(), body.end() - 1, t_position) != body.end() - 1) {
+            return false;
+        }
+
+        for (auto& [otherId, otherSnake] : m_snakes) {
+            if (t_id == otherId) continue;
+            
+            if (t_position == otherSnake.get_head() && snake.get_length() <= otherSnake.get_length()) {
+                return false;
+            }  
+                
+            const auto& otherBody = otherSnake.get_body();
+            if (std::find(otherBody.begin(), otherBody.end() - 1, t_position) != otherBody.end() - 1) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    const std::unordered_map<std::string, Snake>& Board::get_snakes() const {
+        return m_snakes;
+    }
+
+    const Snake& Board::get_snake(const std::string& t_id) const {
+        return m_snakes.at(t_id);
     }
 
     std::optional<std::string> Board::get_winner() const {
@@ -174,7 +202,7 @@ namespace Simulator {
         std::unordered_set<Position, PositionHash> eatenFood = {};
         for (auto& [k, snake] : m_snakes) {
             const Position head = snake.get_head();
-            if (m_food.cells(head.x, head.y)) {
+            if (is_in_bounds(head) && m_food.cells(head.x, head.y)) {
                 snake.set_health(m_ruleset.startingHealth);
                 eatenFood.insert(head);
             }
@@ -235,46 +263,15 @@ namespace Simulator {
     }
 
     void Board::eliminate_snakes() {
-        std::unordered_set<std::string> toBeEliminated;
-
-        for (auto& [key , snake] : m_snakes) {
-            const Position head = snake.get_head();
-            if (!is_in_bounds(head) || !snake.is_alive()) {
-                toBeEliminated.insert(key);
-                continue;
-            }
-
-            const auto& body = snake.get_body();
-            if (std::find(body.begin(), body.end() - 1, head) != body.end() - 1) {
-                toBeEliminated.insert(key);
-                continue;
-            }
-
-            for (auto& [otherKey, otherSnake] : m_snakes) {
-                if (otherKey == key) continue;
-                
-                if (head == otherSnake.get_head() && snake.get_length() <= otherSnake.get_length()) {
-                    toBeEliminated.insert(key);
-                    break;
-                }  
-                    
-                const auto& otherBody = otherSnake.get_body();
-                if (std::find(otherBody.begin(), otherBody.end() - 1, head) != otherBody.end() - 1) {
-                    toBeEliminated.insert(key);
-                    break;
-                }
+        std::vector<std::string> toBeEliminated;
+        for (const auto& [id, snake] : m_snakes) {
+            if (!snake.is_alive() || !is_safe_cell(id, snake.get_head())) {
+                toBeEliminated.push_back(id);
             }
         }
-
-        for (auto k : toBeEliminated) {
-            m_snakes.erase(k);
+        for (const auto& id : toBeEliminated) {
+            m_snakes.erase(id);
         }
-    }
-
-    bool Board::is_in_bounds(Position t_position) const {
-        return 
-            (t_position.x >= 0 && t_position.x < m_ruleset.w) &&
-            (t_position.y >= 0 && t_position.y < m_ruleset.h);
     }
 
 }

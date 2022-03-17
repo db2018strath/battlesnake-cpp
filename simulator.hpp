@@ -45,6 +45,19 @@ namespace Simulator {
         size_t operator()(const Position& t_pos) const noexcept;
     };
 
+    constexpr Position update_position(Position t_position, Direction t_direction) {
+        switch(t_direction) {
+            case Direction::UP:
+                return Position{t_position.x, t_position.y - 1};
+            case Direction::DOWN:
+                return Position{t_position.x, t_position.y + 1};
+            case Direction::LEFT:
+                return Position{t_position.x - 1, t_position.y};
+            case Direction::RIGHT:
+                return Position{t_position.x + 1, t_position.y};
+        }
+    }
+
     class Snake {
     public:
         Snake(const std::vector<Position>& t_body, int t_health=100);
@@ -92,6 +105,11 @@ namespace Simulator {
         void update(const std::unordered_map<std::string, Direction>& t_moves);
 
         [[nodiscard]] Ruleset get_ruleset() const;
+        [[nodiscard]] bool is_in_bounds(Position t_position) const;
+        [[nodiscard]] bool is_safe_cell(const std::string& t_id, Position t_position) const;
+
+        [[nodiscard]] const std::unordered_map<std::string, Snake>& get_snakes() const;
+        [[nodiscard]] const Snake& get_snake(const std::string& t_id) const;
 
         // Returns the index of the snake that has won the game
         // If all snakes have been eliminated then m_snakes.size() is returned
@@ -104,8 +122,6 @@ namespace Simulator {
         void randomly_place_food(unsigned int t_count);
         void spawn_food();
         void eliminate_snakes();
-
-        [[nodiscard]] bool is_in_bounds(Position t_position) const;
 
         std::unordered_map<std::string, Snake> m_snakes;
         FoodGrid m_food;

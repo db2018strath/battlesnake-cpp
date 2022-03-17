@@ -6,7 +6,7 @@ INCLUDEFLAGS=-Ivendor/crow/include
 
 OTHER_FLAGS=
 
-DEBUGFLAGS=-Wall -ggdb -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+DEBUGFLAGS=-Wall -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
 RELEASEFLAGS=-O2
 CPPFLAGS=-std=c++17
 
@@ -86,7 +86,7 @@ objdirs:
 
 .PHONY: clean
 clean:
-	-rm $(OUT_SERVER_DEBUG) $(OUT_SERVER_RELEASE) $(OUT_AI_RUN_DEBUG) $(OUT_AI_RUN_RELEASE) $(debugObjs) $(releaseObjs)
+	-rm $(OUT_SERVER_DEBUG) $(OUT_SERVER_RELEASE) $(OUT_AI_RUN_DEBUG) $(OUT_AI_RUN_RELEASE) $(serverDebugObjs) $(serverReleaseObjs) $(aiRunDebugObjs) $(aiRunReleaseObjs)
 	-rmdir $(OUTDIR_DEBUG) $(OUTDIR_RELEASE) $(OUTDIR)
 	-rmdir $(debugObjDir) $(releaseObjDir)
 	-rmdir $(objdir)
