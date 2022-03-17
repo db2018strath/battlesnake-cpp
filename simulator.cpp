@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iostream>
 #include <random>
 
 #include "simulator.hpp"
@@ -15,10 +16,18 @@ namespace Simulator {
         return ((t_p1.x == t_p2.x) && (t_p1.y == t_p2.y));
     }
 
+    bool operator!=(Position t_p1, Position t_p2) {
+        return !(t_p1 == t_p2);
+    }
+
     Snake::Snake(const std::vector<Position>& t_body, int t_health)
         : m_body(t_body)
         , m_health(t_health)
     {
+        ;
+    }
+
+    Snake::Snake(Position t_head, unsigned int t_length, int t_health) : Snake(std::vector<Position>(t_length, t_head), t_health) {
         ;
     }
 
@@ -38,6 +47,7 @@ namespace Simulator {
                 m_body.push_back(Position{head.x + 1, head.y});
                 break;
         }
+        m_health--;
     }
 
     void Snake::pop_tail() {
@@ -77,7 +87,7 @@ namespace Simulator {
     }
 
     void Board::update(const std::unordered_map<std::string, Direction>& t_moves) {
-        for (auto [k, snake] : m_snakes) {
+        for (auto& [k, snake] : m_snakes) {
             snake.move(t_moves.at(k));
         }
 
@@ -104,6 +114,11 @@ namespace Simulator {
     std::string Board::to_string() const {
         std::string result;
 
+        result += "DIM: " + std::to_string(m_ruleset.w) + 'x' + std::to_string(m_ruleset.h) + '\n';
+        for (const auto& [id, snake] : m_snakes) {
+            result += "Player " + id + " Health: " + std::to_string(snake.get_health()) + '\n';
+        }
+
         for (int x = 0; x < m_ruleset.w; x++) {
             result += "##";
         }
@@ -116,7 +131,7 @@ namespace Simulator {
                 const Position pos{x, y};
 
                 bool snakeFound = false;
-                for (auto [k, snake] : m_snakes) {
+                for (auto& [k, snake] : m_snakes) {
                     const auto& body = snake.get_body();
                     if (std::find(body.begin(), body.end(), pos) != body.end()) {
                         if (pos == snake.get_head()) {
@@ -157,8 +172,7 @@ namespace Simulator {
 
     void Board::feed_snakes() {
         std::unordered_set<Position, PositionHash> eatenFood = {};
-        
-        for (auto [k, snake] : m_snakes) {
+        for (auto& [k, snake] : m_snakes) {
             const Position head = snake.get_head();
             if (m_food.cells(head.x, head.y)) {
                 snake.set_health(m_ruleset.startingHealth);
@@ -172,6 +186,7 @@ namespace Simulator {
         for (Position food : eatenFood) {
             m_food.cells(food.x, food.y) = false;
         }
+        m_food.count -= eatenFood.size();
     }
 
     void Board::randomly_place_food(unsigned int t_count) {
@@ -204,6 +219,7 @@ namespace Simulator {
             const Position pos = freeCells[i];
             m_food.cells(pos.x, pos.y) = true;
         }
+        m_food.count += foodToAdd;
 
     }
 
@@ -221,7 +237,7 @@ namespace Simulator {
     void Board::eliminate_snakes() {
         std::unordered_set<std::string> toBeEliminated;
 
-        for (auto [key , snake] : m_snakes) {
+        for (auto& [key , snake] : m_snakes) {
             const Position head = snake.get_head();
             if (!is_in_bounds(head) || !snake.is_alive()) {
                 toBeEliminated.insert(key);
@@ -229,23 +245,21 @@ namespace Simulator {
             }
 
             const auto& body = snake.get_body();
-            if (std::find(std::next(body.begin()), body.end(), head) != body.end()) {
+            if (std::find(body.begin(), body.end() - 1, head) != body.end() - 1) {
                 toBeEliminated.insert(key);
                 continue;
             }
 
-            for (auto [otherKey, otherSnake] : m_snakes) {
+            for (auto& [otherKey, otherSnake] : m_snakes) {
                 if (otherKey == key) continue;
                 
-                if (head == otherSnake.get_head()) {
-                    if (snake.get_length() <= otherSnake.get_length()) {
-                        toBeEliminated.insert(key);
-                    }
+                if (head == otherSnake.get_head() && snake.get_length() <= otherSnake.get_length()) {
+                    toBeEliminated.insert(key);
                     break;
                 }  
                     
                 const auto& otherBody = otherSnake.get_body();
-                if (std::find(otherBody.begin(), otherBody.end() - 1, head) != otherBody.end()) {
+                if (std::find(otherBody.begin(), otherBody.end() - 1, head) != otherBody.end() - 1) {
                     toBeEliminated.insert(key);
                     break;
                 }

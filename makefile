@@ -10,49 +10,71 @@ DEBUGFLAGS=-Wall -ggdb -fsanitize=address -fno-omit-frame-pointer -fsanitize=und
 RELEASEFLAGS=-O2
 CPPFLAGS=-std=c++17
 
-OUTNAME=battlesnake
+OUTNAME_SERVER=server
+OUTNAME_AI_RUN=ai_run
 
 OUTDIR=out
 OUTDIR_DEBUG=$(OUTDIR)/debug
 OUTDIR_RELEASE=$(OUTDIR)/release
-OUT_DEBUG=$(OUTDIR_DEBUG)/$(OUTNAME)
-OUT_RELEASE=$(OUTDIR_RELEASE)/$(OUTNAME)
+
+OUT_SERVER_DEBUG=$(OUTDIR_DEBUG)/$(OUTNAME_SERVER)
+OUT_SERVER_RELEASE=$(OUTDIR_RELEASE)/$(OUTNAME_SERVER)
+
+OUT_AI_RUN_DEBUG=$(OUTDIR_DEBUG)/$(OUTNAME_AI_RUN)
+OUT_AI_RUN_RELEASE=$(OUTDIR_RELEASE)/$(OUTNAME_AI_RUN)
 
 # Obj output
 objdir=objdir
 debugObjDir=$(objdir)/debug
 releaseObjDir=$(objdir)/release
 
-objs=server.o server_logic.o simulator.o
+objs=ai.o server_logic.o simulator.o
 
-debugObjs=$(addprefix $(debugObjDir)/,$(objs))
-releaseObjs=$(addprefix $(releaseObjDir)/,$(objs))
+server_objs=$(objs) server.o
+ai_run_objs=$(objs) ai_run.o
+
+
+serverDebugObjs=$(addprefix $(debugObjDir)/,$(server_objs))
+serverReleaseObjs=$(addprefix $(releaseObjDir)/,$(server_objs))
+
+aiRunDebugObjs=$(addprefix $(debugObjDir)/,$(ai_run_objs))
+aiRunReleaseObjs=$(addprefix $(releaseObjDir)/,$(ai_run_objs))
 
 # Headers
 headers=server_logic.hpp simulator.hpp grid.hpp
 
-# Debug Build
-$(OUT_DEBUG): $(debugObjs)
-	$(CXX) -o $@ $(debugObjs) $(CPPFLAGS) $(LINKFLAGS) $(DEBUGFLAGS) $(OTHER_FLAGS)
+# Debug Builds
+$(OUT_SERVER_DEBUG): $(serverDebugObjs)
+	$(CXX) -o $@ $(serverDebugObjs) $(CPPFLAGS) $(LINKFLAGS) $(DEBUGFLAGS) $(OTHER_FLAGS)
+
+$(OUT_AI_RUN_DEBUG): $(aiRunDebugObjs)
+	$(CXX) -o $@ $(aiRunDebugObjs) $(CPPFLAGS) $(LINKFLAGS) $(DEBUGFLAGS) $(OTHER_FLAGS)
 
 $(debugObjDir)/%.o: %.cpp $(headers) | objdirs
 	$(CXX) -c -o $@ $(patsubst $(debugObjDir)/%,%,$(@:.o=.cpp)) $(INCLUDEFLAGS) $(CPPFLAGS) $(DEBUGFLAGS) $(OTHER_FLAGS)
 
-# Release Build
-$(OUT_RELEASE): $(releaseObjs)
-	$(CXX) -o $@ $(releaseObjs) $(CPPFLAGS) $(LINKFLAGS) $(RELEASEFLAGS) $(OTHER_FLAGS)
+# Release Builds
+$(OUT_SERVER_RELEASE): $(serverReleaseObjs)
+	$(CXX) -o $@ $(serverReleaseObjs) $(CPPFLAGS) $(LINKFLAGS) $(RELEASEFLAGS) $(OTHER_FLAGS)
+
+$(OUT_AI_RUN_RELEASE): $(aiRunReleaseObjs)
+	$(CXX) -o $@ $(aiRunReleaseObjs) $(CPPFLAGS) $(LINKFLAGS) $(RELEASEFLAGS) $(OTHER_FLAGS)
 
 $(releaseObjDir)/%.o: %.cpp $(headers) | objdirs
 	$(CXX) -c -o $@ $(patsubst $(releaseObjDir)/%,%,$(@:.o=.cpp)) $(INCLUDEFLAGS) $(CPPFLAGS) $(RELEASEFLAGS) $(OTHER_FLAGS)
 
 
-.PHONY: debug
-debug: $(OUT_DEBUG)
+.PHONY: server_debug
+server_debug: $(OUT_SERVER_DEBUG)
 
+.PHONY: ai_run_debug
+ai_run_debug: $(OUT_AI_RUN_DEBUG)
 
-.PHONY: release
-release: $(OUT_RELEASE)
+.PHONY: server_release
+server_release: $(OUT_SERVER_RELEASE)
 
+.PHONY: ai_run_release
+ai_run_release: $(OUT_AI_RUN_RELEASE)
 
 # Helpers
 .PHONY: objdirs
@@ -64,7 +86,7 @@ objdirs:
 
 .PHONY: clean
 clean:
-	-rm $(OUT_DEBUG) $(OUT_RELEASE) $(debugObjs) $(releaseObjs)
+	-rm $(OUT_SERVER_DEBUG) $(OUT_SERVER_RELEASE) $(OUT_AI_RUN_DEBUG) $(OUT_AI_RUN_RELEASE) $(debugObjs) $(releaseObjs)
 	-rmdir $(OUTDIR_DEBUG) $(OUTDIR_RELEASE) $(OUTDIR)
 	-rmdir $(debugObjDir) $(releaseObjDir)
 	-rmdir $(objdir)

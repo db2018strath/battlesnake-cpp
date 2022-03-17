@@ -38,6 +38,7 @@ namespace Simulator {
         int x, y;
 
         friend bool operator==(Position t_p1, Position t_p2);
+        friend bool operator!=(Position t_p1, Position t_p2);
     };
 
     struct PositionHash {
@@ -46,7 +47,8 @@ namespace Simulator {
 
     class Snake {
     public:
-        Snake(const std::vector<Position>& t_body, int t_health);
+        Snake(const std::vector<Position>& t_body, int t_health=100);
+        Snake(Position t_head, unsigned int t_length, int t_health=100);
 
         // Move without removing the end of the tail
         void move(Direction t_direction);
