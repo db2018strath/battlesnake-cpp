@@ -1,5 +1,5 @@
 # Constants
-CXX=g++
+CXX=clang++
 
 LINKFLAGS=-lboost_system -lpthread
 INCLUDEFLAGS=-Ivendor/crow/include
@@ -23,7 +23,7 @@ objdir=objdir
 debugObjDir=$(objdir)/debug
 releaseObjDir=$(objdir)/release
 
-objs=main.o server_logic.o simulator.o
+objs=server.o server_logic.o simulator.o
 
 debugObjs=$(addprefix $(debugObjDir)/,$(objs))
 releaseObjs=$(addprefix $(releaseObjDir)/,$(objs))

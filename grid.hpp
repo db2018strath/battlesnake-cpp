@@ -26,6 +26,10 @@ public:
     [[nodiscard]] unsigned int get_height() const {
         return m_grid.size() / m_w;
     }
+
+    [[nodiscard]] unsigned int size() const {
+        return m_grid.size();
+    }
 private:
     const unsigned int m_w;
     std::vector<T> m_grid;
@@ -55,6 +59,10 @@ public:
     
     [[nodiscard]] unsigned int get_height() const {
         return m_grid.size() / m_w;
+    }
+
+    [[nodiscard]] unsigned int size() const {
+        return m_grid.size();
     }
 private:
     const unsigned int m_w;

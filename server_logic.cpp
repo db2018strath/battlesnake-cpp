@@ -18,12 +18,17 @@ namespace ServerLogic {
             auto bodyData = snakeData["body"];
             auto segments = bodyData.lo();
             for (auto it = segments.rbegin(); it != segments.rend(); ++it) {
-                const int x = (*it)["x"].i();
-                const int y = (*it)["y"].i();
-                body.push_back(Simulator::Position{x, h - 1 - y}); // flip y vertically to match online display
+                const unsigned int x = (*it)["x"].u();
+                const unsigned int y = (*it)["y"].u();
+                body.push_back(
+                    Simulator::Position{
+                        static_cast<int>(x),
+                        static_cast<int>(h - 1 - y) // flip y vertically to match online display
+                    }
+                ); 
             }
 
-            snakes[id] = Simulator::Snake(body, health);
+            snakes.emplace(id, Simulator::Snake(body, health));
         }
 
         const unsigned int noSnakes = snakes.size();
@@ -33,6 +38,7 @@ namespace ServerLogic {
         const Simulator::Ruleset ruleset{w, h, noSnakes, foodSpawnChance, minFood};
 
         Grid<bool> food{w, h};
+        const unsigned int foodCount = t_data["board"]["food"].size();
         for (const auto foodData : t_data["board"]["food"]) {
             const unsigned int x = foodData["x"].u();
             const unsigned int y = foodData["y"].u();
@@ -40,7 +46,7 @@ namespace ServerLogic {
             food(x, h - 1 - y) = true;
         }
         
-        Simulator::Board board{snakes, food, ruleset};
+        Simulator::Board board{snakes, Simulator::FoodGrid{food, foodCount}, ruleset};
 
         return board.to_string();
         

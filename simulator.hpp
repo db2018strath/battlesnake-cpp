@@ -1,6 +1,7 @@
 #ifndef SIMULATOR_INCLUDED
 #define SIMULATOR_INCLUDED
 
+#include <functional>
 #include <optional>
 #include <string>
 #include <unordered_set>
@@ -39,6 +40,10 @@ namespace Simulator {
         friend bool operator==(Position t_p1, Position t_p2);
     };
 
+    struct PositionHash {
+        size_t operator()(const Position& t_pos) const noexcept;
+    };
+
     class Snake {
     public:
         Snake(const std::vector<Position>& t_body, int t_health);
@@ -71,13 +76,18 @@ namespace Simulator {
 
     constexpr Ruleset DEFAULT_RULESET {11, 11, 2, 1, 15, 100, true};
 
+    struct FoodGrid {
+        Grid<bool> cells;
+        unsigned int count;
+    };
+
     class Board {
     public:
         //Board(Ruleset t_ruleset=DEFAULT_RULESET);
         //Board(const std::vector<Snake>& t_snakes, Ruleset t_ruleset=DEFAULT_RULESET);
-        Board(const std::unordered_map<std::string, Snake>& t_snakes, Grid<bool> t_food, Ruleset t_ruleset=DEFAULT_RULESET);
+        Board(const std::unordered_map<std::string, Snake>& t_snakes, const FoodGrid& t_food, Ruleset t_ruleset=DEFAULT_RULESET);
 
-        void update(const std::vector<Direction>& t_moves);
+        void update(const std::unordered_map<std::string, Direction>& t_moves);
 
         [[nodiscard]] Ruleset get_ruleset() const;
 
@@ -96,7 +106,7 @@ namespace Simulator {
         [[nodiscard]] bool is_in_bounds(Position t_position) const;
 
         std::unordered_map<std::string, Snake> m_snakes;
-        Grid<bool> m_food;
+        FoodGrid m_food;
 
         const Ruleset m_ruleset;
     };
