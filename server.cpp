@@ -25,12 +25,7 @@ int main(int argc, char* argv[]) {
     CROW_ROUTE(app, "/move").methods(crow::HTTPMethod::POST)([](const crow::request& req){
         crow::json::rvalue json = crow::json::load(req.body.c_str(), req.body.length());
         
-        const std::string boardString = ServerLogic::choose_move(json);
-        CROW_LOG_INFO << '\n' << boardString;
-        
-        const std::string move = "left";
-        
-        return R"({"move": ")" + move + "\"}";
+        return R"({"move": ")" + ServerLogic::choose_move(json) + "\"}";
     });
 
     CROW_ROUTE(app, "/end").methods(crow::HTTPMethod::POST)([](const crow::request& req){

@@ -128,6 +128,10 @@ namespace Simulator {
         return m_snakes.at(t_id);
     }
 
+    const FoodGrid& Board::get_food() const {
+        return m_food;
+    }
+
     std::optional<std::string> Board::get_winner() const {
         switch (m_snakes.size()) {
             case 0:

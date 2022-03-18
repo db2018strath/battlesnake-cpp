@@ -1,3 +1,4 @@
+#include "ai.hpp"
 #include "server_logic.hpp"
 #include "simulator.hpp"
 
@@ -46,11 +47,11 @@ namespace ServerLogic {
             food(x, h - 1 - y) = true;
         }
         
-        Simulator::Board board{snakes, Simulator::FoodGrid{food, foodCount}, ruleset};
+         const Simulator::Board board{snakes, Simulator::FoodGrid{food, foodCount}, ruleset};
 
-        return board.to_string();
+        const std::string id = t_data["you"]["id"].s();
         
-        //return Simulator::direction_to_string(Simulator::Direction::LEFT);
+        return Simulator::direction_to_string(AI::seek_food_player(board, id));
     }
 
 }

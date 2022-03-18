@@ -110,6 +110,7 @@ namespace Simulator {
 
         [[nodiscard]] const std::unordered_map<std::string, Snake>& get_snakes() const;
         [[nodiscard]] const Snake& get_snake(const std::string& t_id) const;
+        [[nodiscard]] const FoodGrid& get_food() const;
 
         // Returns the index of the snake that has won the game
         // If all snakes have been eliminated then m_snakes.size() is returned
