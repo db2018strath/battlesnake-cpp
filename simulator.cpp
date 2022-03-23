@@ -72,6 +72,12 @@ namespace Simulator {
         ;
     }
 
+    Board::Board(const Board& t_board, Ruleset t_ruleset) 
+        : Board(t_board.get_snakes(), t_board.get_food(), t_ruleset) 
+    {
+        ;
+    }
+
     void Board::update(const std::unordered_map<std::string, Direction>& t_moves) {
         for (auto& [k, snake] : m_snakes) {
             snake.move(t_moves.at(k));
@@ -132,7 +138,7 @@ namespace Simulator {
         return m_food;
     }
 
-    std::optional<std::string> Board::get_winner() const {
+    std::optional<const std::string&> Board::get_winner() const {
         switch (m_snakes.size()) {
             case 0:
                 return "";

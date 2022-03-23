@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <array>
+#include <chrono>
 #include <limits>
 #include <random>
 #include <vector>
@@ -10,14 +10,6 @@ namespace AI {
 
     static std::mt19937 rng(0);
 
-    constexpr std::array<Simulator::Direction, 4> DIRECTIONS_MAP {
-        Simulator::Direction::UP,
-        Simulator::Direction::DOWN,
-        Simulator::Direction::LEFT,
-        Simulator::Direction::RIGHT
-    };
-
-    std::vector<Simulator::Direction> get_safe_moves(const Simulator::Board& t_board, const std::string& t_playerId);
     unsigned int grid_distance(Simulator::Position t_p1, Simulator::Position t_p2);
 
     Simulator::Direction random_player(const Simulator::Board& t_board, const std::string& t_playerId) {

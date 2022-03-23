@@ -98,9 +98,8 @@ namespace Simulator {
 
     class Board {
     public:
-        //Board(Ruleset t_ruleset=DEFAULT_RULESET);
-        //Board(const std::vector<Snake>& t_snakes, Ruleset t_ruleset=DEFAULT_RULESET);
         Board(const std::unordered_map<std::string, Snake>& t_snakes, const FoodGrid& t_food, Ruleset t_ruleset=DEFAULT_RULESET);
+        Board(const Board& t_board, Ruleset t_ruleset=DEFAULT_RULESET);
 
         void update(const std::unordered_map<std::string, Direction>& t_moves);
 
@@ -114,7 +113,7 @@ namespace Simulator {
 
         // Returns the index of the snake that has won the game
         // If all snakes have been eliminated then m_snakes.size() is returned
-        [[nodiscard]] std::optional<std::string> get_winner() const;
+        [[nodiscard]] std::optional<const std::string&> get_winner() const;
 
         [[nodiscard]] std::string to_string() const;
 

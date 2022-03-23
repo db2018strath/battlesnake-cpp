@@ -28,7 +28,7 @@ objdir=objdir
 debugObjDir=$(objdir)/debug
 releaseObjDir=$(objdir)/release
 
-objs=ai.o server_logic.o simulator.o
+objs=ai.o ai_suct.o server_logic.o simulator.o
 
 server_objs=$(objs) server.o
 ai_run_objs=$(objs) ai_run.o
