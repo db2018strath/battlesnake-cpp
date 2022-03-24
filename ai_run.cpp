@@ -13,10 +13,10 @@ int main(int argc, char* argv[]) {
     Simulator::Board board{snakes, food};
 
     std::cout << board.to_string();
-    while (board.get_winner() == std::nullopt) {
+    while (!board.is_game_over()) {
         std::unordered_map<std::string, Simulator::Direction> moveMap;
         for (const auto& [id, s] : snakes) {
-            const Simulator::Direction move = AI::avoid_walls_player(board, id);
+            const Simulator::Direction move = AI::mcts_suct_player(board, id, 200);
             std::cout << id << " chose '" << Simulator::direction_to_string(move) << "'\n";
             moveMap[id] = move;
         }

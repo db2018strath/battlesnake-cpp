@@ -6,7 +6,7 @@ INCLUDEFLAGS=-Ivendor/crow/include
 
 OTHER_FLAGS=
 
-DEBUGFLAGS=-Wall -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined
+DEBUGFLAGS=-Wall -fsanitize=address -fno-omit-frame-pointer -fsanitize=undefined -ggdb
 RELEASEFLAGS=-O2
 CPPFLAGS=-std=c++17
 
@@ -75,6 +75,9 @@ server_release: $(OUT_SERVER_RELEASE)
 
 .PHONY: ai_run_release
 ai_run_release: $(OUT_AI_RUN_RELEASE)
+
+.PHONY: all
+all: server_debug server_release ai_run_debug ai_run_release
 
 # Helpers
 .PHONY: objdirs

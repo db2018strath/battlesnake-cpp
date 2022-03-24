@@ -30,8 +30,14 @@ public:
     [[nodiscard]] unsigned int size() const {
         return m_grid.size();
     }
+
+    bool operator==(const Grid<T>& t_other) const {
+        return
+            (m_w == t_other.m_w) &&  
+            (m_grid == t_other.m_grid);  
+    }
 private:
-    const unsigned int m_w;
+    unsigned int m_w;
     std::vector<T> m_grid;
 };
 
@@ -64,8 +70,14 @@ public:
     [[nodiscard]] unsigned int size() const {
         return m_grid.size();
     }
+
+    bool operator==(const Grid<bool>& t_other) const {
+        return
+            (m_w == t_other.m_w) &&
+            (m_grid == t_other.m_grid);
+    }
 private:
-    const unsigned int m_w;
+    unsigned int m_w;
     std::vector<bool> m_grid;
 };
 

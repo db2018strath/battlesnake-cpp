@@ -10,7 +10,7 @@ namespace ServerLogic {
         
         std::unordered_map<std::string, Simulator::Snake> snakes;
         auto snakesData = t_data["board"]["snakes"];
-        for (const auto snakeData : snakesData.lo()) {     
+        for (const auto& snakeData : snakesData.lo()) {     
             const std::string id = snakeData["id"].s();
             const int health = snakeData["health"].i();
 
@@ -40,7 +40,7 @@ namespace ServerLogic {
 
         Grid<bool> food{w, h};
         const unsigned int foodCount = t_data["board"]["food"].size();
-        for (const auto foodData : t_data["board"]["food"]) {
+        for (const auto& foodData : t_data["board"]["food"]) {
             const unsigned int x = foodData["x"].u();
             const unsigned int y = foodData["y"].u();
             

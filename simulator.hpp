@@ -2,7 +2,6 @@
 #define SIMULATOR_INCLUDED
 
 #include <functional>
-#include <optional>
 #include <string>
 #include <unordered_set>
 #include <unordered_map>
@@ -78,15 +77,24 @@ namespace Simulator {
         [[nodiscard]] int get_health() const;
 
         [[nodiscard]] bool is_alive() const;
+
+        friend bool operator==(const Snake& t_s1, const Snake& t_s2);
+        friend struct SnakeHash;
     private:
         std::vector<Position> m_body;
         int m_health;
+    };
+
+    struct SnakeHash {
+        size_t operator()(const Snake& t_snake) const noexcept;
     };
 
     struct Ruleset {
         unsigned int w, h, noSnakes, minFood, foodSpawnChance;
         int startingHealth;
         bool spawnFood;
+
+        friend bool operator==(Ruleset t_r1, Ruleset t_r2);
     };
 
     constexpr Ruleset DEFAULT_RULESET {11, 11, 2, 1, 15, 100, true};
@@ -94,6 +102,13 @@ namespace Simulator {
     struct FoodGrid {
         Grid<bool> cells;
         unsigned int count;
+
+        friend bool operator==(const FoodGrid& t_g1, const FoodGrid& t_g2);
+        friend struct FoodGridHash;
+    };
+
+    struct FoodGridHash {
+        size_t operator()(const FoodGrid& t_foodGrid) const noexcept;
     };
 
     class Board {
@@ -113,10 +128,13 @@ namespace Simulator {
 
         // Returns the index of the snake that has won the game
         // If all snakes have been eliminated then m_snakes.size() is returned
-        [[nodiscard]] std::optional<const std::string&> get_winner() const;
+        [[nodiscard]] const std::string* get_winner() const;
+        [[nodiscard]] bool is_game_over() const;
 
         [[nodiscard]] std::string to_string() const;
 
+        friend bool operator==(const Board& t_b1, const Board& t_b2);
+        friend struct BoardHash;
     private:
         void feed_snakes();
         void randomly_place_food(unsigned int t_count);
@@ -126,7 +144,11 @@ namespace Simulator {
         std::unordered_map<std::string, Snake> m_snakes;
         FoodGrid m_food;
 
-        const Ruleset m_ruleset;
+        Ruleset m_ruleset;
+    };
+
+    struct BoardHash {
+        size_t operator()(const Board& t_ruleset) const noexcept;
     };
 
 }

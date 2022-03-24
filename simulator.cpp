@@ -80,7 +80,13 @@ namespace Simulator {
 
     void Board::update(const std::unordered_map<std::string, Direction>& t_moves) {
         for (auto& [k, snake] : m_snakes) {
-            snake.move(t_moves.at(k));
+            const auto moveIt = t_moves.find(k);
+            if (moveIt != t_moves.end()) {
+                snake.move(moveIt->second);
+            }
+            else {
+                snake.move(Simulator::Direction::UP); // TODO: change this
+            }
         }
 
         feed_snakes();
@@ -103,7 +109,12 @@ namespace Simulator {
             return false;
         }
 
-        const Snake& snake = m_snakes.at(t_id);
+        const auto snakeIt = m_snakes.find(t_id);
+        if (snakeIt == m_snakes.end()) {
+            return false; // TODO: change this
+        }
+
+        const Snake& snake = snakeIt->second;
 
         const auto& body = snake.get_body();
         if (std::find(body.begin(), body.end() - 1, t_position) != body.end() - 1) {
@@ -131,22 +142,31 @@ namespace Simulator {
     }
 
     const Snake& Board::get_snake(const std::string& t_id) const {
-        return m_snakes.at(t_id);
+        const auto snakeIt = m_snakes.find(t_id);
+        if (snakeIt != m_snakes.end()) {
+            return snakeIt->second;
+        }
+        else {
+            std::cout << "oops\n";
+            return m_snakes.at(t_id);
+        }
     }
 
     const FoodGrid& Board::get_food() const {
         return m_food;
     }
 
-    std::optional<const std::string&> Board::get_winner() const {
+    const std::string* Board::get_winner() const {
         switch (m_snakes.size()) {
-            case 0:
-                return "";
             case 1:
-                return m_snakes.begin()->first;
+                return &m_snakes.begin()->first;
             default:
-                return std::nullopt;
+                return nullptr;
         }
+    }
+
+    bool Board::is_game_over() const {
+        return (m_snakes.size() <= 1);
     }
 
     std::string Board::to_string() const {
@@ -282,6 +302,72 @@ namespace Simulator {
         for (const auto& id : toBeEliminated) {
             m_snakes.erase(id);
         }
+    }
+
+    bool operator==(const Snake& t_s1, const Snake& t_s2) {
+        return
+            (t_s1.m_health == t_s2.m_health) &&
+            (t_s1.m_body == t_s2.m_body);
+    }
+
+    size_t SnakeHash::operator()(const Snake& t_snake) const noexcept {
+        size_t result = std::hash<int>()(t_snake.m_health);
+        for (Position pos : t_snake.m_body) {
+            result = (result ^ (PositionHash{}(pos) << 1)) >> 1;
+        }
+        return result;
+    }
+
+    bool operator==(Ruleset t_r1, Ruleset t_r2) {
+        return
+            (t_r1.w == t_r2.w) &&
+            (t_r1.h == t_r2.h) &&
+            (t_r1.noSnakes == t_r2.noSnakes) &&
+            (t_r1.minFood == t_r2.minFood) &&
+            (t_r1.foodSpawnChance == t_r2.foodSpawnChance) &&
+            (t_r1.startingHealth == t_r2.startingHealth) &&
+            (t_r1.spawnFood == t_r2.spawnFood);
+    }
+
+    bool operator==(const FoodGrid& t_g1, const FoodGrid& t_g2) {
+        return
+            (t_g1.count == t_g2.count) &&
+            (t_g1.cells == t_g2.cells);
+    }
+
+    size_t FoodGridHash::operator()(const FoodGrid& t_foodGrid) const noexcept {
+        size_t result = 0;
+        for (unsigned int y = 0; y < t_foodGrid.cells.get_height(); y++) {
+            for (unsigned int x = 0; x < t_foodGrid.cells.get_width(); x++) {
+                result = (result ^ (std::hash<bool>()(t_foodGrid.cells(x, y)) << 1)) >> 1;
+            }
+        }
+
+        return result;
+    }
+
+    bool operator==(const Board& t_b1, const Board& t_b2) {
+        return
+            (t_b1.m_ruleset == t_b2.m_ruleset) &&
+            (t_b1.m_snakes == t_b2.m_snakes) &&
+            (t_b1.m_food == t_b2.m_food);
+    }
+
+    size_t BoardHash::operator()(const Board& t_board) const noexcept {
+        // return 0;
+
+        ///*
+        // ruleset not included in hash as it does not change during the course of a game
+        size_t result = FoodGridHash{}(t_board.m_food);
+        for (const auto& [id, snake] : t_board.m_snakes) {
+            // id not included since it also does not change
+            const size_t snakeHash = SnakeHash{}(snake);
+
+            result = (result ^ (snakeHash << 1)) >> 1;
+        }
+
+        return result;
+        //*/
     }
 
 }
