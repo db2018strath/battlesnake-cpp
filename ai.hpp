@@ -11,8 +11,15 @@ namespace AI {
     Simulator::Direction avoid_walls_player(const Simulator::Board& t_board, const std::string& t_playerId);
     Simulator::Direction seek_food_player(const Simulator::Board& t_board, const std::string& t_playerId);
 
-    Simulator::Direction mcts_suct_player(const Simulator::Board& t_board, const std::string& t_playerId, unsigned int t_time=200);
-    Simulator::Direction mcts_duct_player(const Simulator::Board& t_board, const std::string& t_playerId, unsigned int t_time=200);
+    struct MCTSParameters {
+        unsigned int computeTime;
+        float ucbConstant;
+    };
+
+    constexpr MCTSParameters DEFAULT_PARAMETERS = {200, 1.0f};
+
+    Simulator::Direction mcts_suct_player(const Simulator::Board& t_board, const std::string& t_playerId, MCTSParameters t_params=DEFAULT_PARAMETERS);
+    Simulator::Direction mcts_duct_player(const Simulator::Board& t_board, const std::string& t_playerId, MCTSParameters t_params=DEFAULT_PARAMETERS);
 
     std::vector<Simulator::Direction> get_safe_moves(const Simulator::Board& t_board, const std::string& t_playerId);
 

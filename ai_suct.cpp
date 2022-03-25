@@ -43,13 +43,13 @@ namespace AI {
 
     std::vector<Simulator::Direction> suct_get_unselected_moves(const State& t_state, const NodeMap& t_nodes);
 
-    float suct_ucb(float t_reward, unsigned int t_n, unsigned int t_N);
-    Simulator::Direction suct_select_move(const State& t_state, const NodeMap& t_nodes);
+    float suct_ucb(float t_reward, unsigned int t_n, unsigned int t_N, float t_c);
+    Simulator::Direction suct_select_move(const State& t_state, const NodeMap& t_nodes, MCTSParameters t_params);
 
-    RewardMap suct_mcts_iter(State t_state, NodeMap& t_nodes);
+    RewardMap suct_mcts_iter(const State& t_state, NodeMap& t_nodes, MCTSParameters t_params);
 
 
-    Simulator::Direction mcts_suct_player(const Simulator::Board& t_board, const std::string& t_playerId, unsigned int t_time) {
+    Simulator::Direction mcts_suct_player(const Simulator::Board& t_board, const std::string& t_playerId, MCTSParameters t_params) {
         using std::chrono::duration_cast;
         using std::chrono::high_resolution_clock;
         using std::chrono::milliseconds;
@@ -61,8 +61,8 @@ namespace AI {
         NodeMap nodes;
         nodes[state] = Node{0, {}};
 
-        while (duration_cast<milliseconds>(high_resolution_clock::now() - t1).count() < t_time) {
-            suct_mcts_iter(state, nodes);
+        while (duration_cast<milliseconds>(high_resolution_clock::now() - t1).count() < t_params.computeTime) {
+            suct_mcts_iter(state, nodes, t_params);
         }
 
         const std::vector<Simulator::Direction> safeMoves = get_safe_moves(t_board, t_playerId);
@@ -78,10 +78,8 @@ namespace AI {
             const float totalReward = nodes[nextState].rewards[t_playerId];
             const unsigned int visitCount = nodes[nextState].visitCount;
 
-            // std::cout << Simulator::direction_to_string(move) << ": " << totalReward << " / " << visitCount << '\n';
-
             if (visitCount != 0) {
-                const float score = totalReward / visitCount;
+                const float score = totalReward / static_cast<float>(visitCount);
                 if (score > bestMoveScore) {
                     bestMove = move;
                     bestMoveScore = score;
@@ -89,25 +87,24 @@ namespace AI {
             }
         }
 
-        std::cout << "Nodes visited: " << nodes.size() << '\n';
+        // std::cout << "Nodes visited: " << nodes.size() << '\n';
 
         return bestMove;
     }
 
-    RewardMap suct_mcts_iter(State t_state, NodeMap& t_nodes) {
+    RewardMap suct_mcts_iter(const State& t_state, NodeMap& t_nodes, MCTSParameters t_params) {
         if (t_state.board.is_game_over()) {
             return suct_evaluate_state(t_state);
         }
         else {
             const std::vector<Simulator::Direction> unselectedMoves = suct_get_unselected_moves(t_state, t_nodes);
-            //std::cout << unselectedMoves.size() << '\n';
 
             if (t_nodes.count(t_state) && !unselectedMoves.empty()) {
                 const Simulator::Direction move = unselectedMoves[rng() % unselectedMoves.size()];
 
                 const State newState = suct_update_state(t_state, move);
 
-                const RewardMap rewards = suct_mcts_rollout(newState);
+                RewardMap rewards = suct_mcts_rollout(newState);
                 t_nodes[newState].rewards = rewards;
                 t_nodes[newState].visitCount++;
 
@@ -116,10 +113,10 @@ namespace AI {
                 return rewards;
             }
             else {
-                const Simulator::Direction move = suct_select_move(t_state, t_nodes);
+                const Simulator::Direction move = suct_select_move(t_state, t_nodes, t_params);
                 const State newState = suct_update_state(t_state, move);
 
-                const RewardMap rewards = suct_mcts_iter(newState, t_nodes);
+                RewardMap rewards = suct_mcts_iter(newState, t_nodes, t_params);
                 suct_update_node(t_state, t_nodes, rewards);
 
                 return rewards;
@@ -221,15 +218,15 @@ namespace AI {
         return suct_evaluate_state(currentState);
     }
 
-    float suct_ucb(float t_reward, unsigned int t_n, unsigned int t_N) {
+    float suct_ucb(float t_reward, unsigned int t_n, unsigned int t_N, float t_c) {
         if (t_n == 0) {
             return std::numeric_limits<float>::infinity();
         }
 
-        return (t_reward / t_n) + /* c * */ std::sqrt(std::log(t_N) / t_n);
+        return (t_reward / t_n) + t_c * std::sqrt(std::log(t_N) / t_n);
     }
 
-    Simulator::Direction suct_select_move(const State& t_state, const NodeMap& t_nodes) {
+    Simulator::Direction suct_select_move(const State& t_state, const NodeMap& t_nodes, MCTSParameters t_params) {
         const std::string& currentPlayerId = t_state.turnOrder[t_state.selectedMoves.size()];
 
         const std::vector<Simulator::Direction> safeMoves = get_safe_moves(t_state.board, currentPlayerId);
@@ -258,7 +255,7 @@ namespace AI {
                 const unsigned int n = nodeIt->second.visitCount;
                 const unsigned int N = parentNodeIt->second.visitCount;
 
-                const float ucb = suct_ucb(r, n, N);
+                const float ucb = suct_ucb(r, n, N, t_params.ucbConstant);
                 if (ucb > bestMoveUCB) {
                     bestMove = move;
                     bestMoveUCB = ucb;

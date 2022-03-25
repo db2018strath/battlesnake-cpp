@@ -34,6 +34,10 @@ namespace AI {
     }
 
     Simulator::Direction seek_food_player(const Simulator::Board& t_board, const std::string& t_playerId) {
+        if (!t_board.is_valid_id(t_playerId)) {
+            return Simulator::Direction::UP; // TODO: change this
+        }
+
         const std::vector<Simulator::Direction> possibleMoves = get_safe_moves(t_board, t_playerId);
 
         const Simulator::Snake& snake = t_board.get_snake(t_playerId);
@@ -79,6 +83,10 @@ namespace AI {
     }
 
     std::vector<Simulator::Direction> get_safe_moves(const Simulator::Board& t_board, const std::string& t_playerId) {
+        if (!t_board.is_valid_id(t_playerId)) {
+            return {}; // TODO: change this
+        }
+
         std::vector<Simulator::Direction> possibleMoves(DIRECTIONS_MAP.begin(), DIRECTIONS_MAP.end());
         
         const auto& playerSnake = t_board.get_snake(t_playerId);

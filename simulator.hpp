@@ -59,7 +59,7 @@ namespace Simulator {
 
     class Snake {
     public:
-        Snake(const std::vector<Position>& t_body, int t_health=100);
+        explicit Snake(const std::vector<Position>& t_body, int t_health=100);
         Snake(Position t_head, unsigned int t_length, int t_health=100);
 
         // Move without removing the end of the tail
@@ -130,6 +130,7 @@ namespace Simulator {
         // If all snakes have been eliminated then m_snakes.size() is returned
         [[nodiscard]] const std::string* get_winner() const;
         [[nodiscard]] bool is_game_over() const;
+        [[nodiscard]] bool is_valid_id(const std::string& t_id) const;
 
         [[nodiscard]] std::string to_string() const;
 

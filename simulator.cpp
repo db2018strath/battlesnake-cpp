@@ -147,7 +147,7 @@ namespace Simulator {
             return snakeIt->second;
         }
         else {
-            std::cout << "oops\n";
+            std::cout << t_id << " oops\n";
             return m_snakes.at(t_id);
         }
     }
@@ -167,6 +167,10 @@ namespace Simulator {
 
     bool Board::is_game_over() const {
         return (m_snakes.size() <= 1);
+    }
+
+    bool Board::is_valid_id(const std::string &t_id) const {
+        return m_snakes.count(t_id);
     }
 
     std::string Board::to_string() const {
