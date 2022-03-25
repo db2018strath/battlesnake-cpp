@@ -37,7 +37,9 @@ namespace Simulator {
     }
 
     void Snake::pop_tail() {
-        m_body.erase(m_body.begin());
+        if (m_body.size() > 1) {
+            m_body.erase(m_body.begin());
+        }
     }
 
     void Snake::set_health(int t_health) {
