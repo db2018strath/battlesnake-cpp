@@ -19,26 +19,26 @@ To install the required dependencies run the corresponding command for your dist
 
 ## Building and Running
 
-First clone the project into its own directory and cd into it:
+### Server
 
+#### Replit
+
+To run on replit:
+- Make an account at https://replit.com.
+- Click on the '+ Create' button to create a new repl.
+- Import this project from github, this may require creating a fork.
+- Run the command `git submodule update --init --recursive` in the console.
+- Click the run button at the top of the page.
+
+#### Self-Host
+
+First clone the project and cd into the created directory with the following commands:
 ```
 git clone --recurse-submodules https://github.com/db2018strath/battlesnake-cpp.git
 cd battlesnake-cpp
 ```
 
-### Server
-
-#### Replit
-
-To run on replit first import the project from github, this may require creating a fork of the project.
-
-Then run the command `git submodule update --init --recursive` in the console.
-
-And then click the run button at the top of the screen.
-
-#### Self-Host
-
-To build the http server run one of the following:
+Then run one of the following:
 
 - Debug: `make server_debug`
 - Release: `make server_release`
@@ -49,13 +49,22 @@ The server is hosted on port 8080 which is the default for Battlesnake.
 
 #### Playing Games
 
-After setting up the server, through Replit or through self-hosting, to have the server play games follow the instructions in steps 4 and 5 provided here: https://docs.battlesnake.com/guides/getting-started#step-4-create-your-battlesnake
+After setting up the server, through Replit or through self-hosting, to have the server play games:
+- First create an account at https://play.battlesnake.com/
+- Then follow the instructions in steps 4 and 5 provided here: https://docs.battlesnake.com/guides/getting-started#step-4-create-your-battlesnake
 
 Note that the agent is only designed to play against atleast one other player so may not perform as well when playing alone.
 
 ### Local
 
-To build the local simulator run one of the following:
+First clone the project and cd into the created directory with the following commands:
+
+```
+git clone --recurse-submodules https://github.com/db2018strath/battlesnake-cpp.git
+cd battlesnake-cpp
+```
+
+Then run one of the following commands:
 
 - Debug: `make ai_run_debug`
 - Release: `make ai_run_release`
