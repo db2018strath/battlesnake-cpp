@@ -45,7 +45,13 @@ To build the http server run one of the following:
 
 After building the resulting binary can be found in `./out/${BUILD_TYPE}/server` where `${BUILD_TYPE}` is either `debug` or `release` corresponding to the one which has been built.
 
-The server is hosted on port 8080 which is the default for battlesnake.
+The server is hosted on port 8080 which is the default for Battlesnake.
+
+#### Playing Games
+
+After setting up the server, through Replit or through self-hosting, to have the server play games follow the instructions in steps 4 and 5 provided here: https://docs.battlesnake.com/guides/getting-started#step-4-create-your-battlesnake
+
+Note that the agent is only designed to play against atleast one other player so may not perform as well when playing alone.
 
 ### Local
 
